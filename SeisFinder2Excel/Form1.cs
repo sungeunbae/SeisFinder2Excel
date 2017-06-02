@@ -62,6 +62,7 @@ namespace WindowsFormsApp1
             this.btnSelectAll.TabIndex = 1;
             this.btnSelectAll.Text = "Select All";
             this.btnSelectAll.UseVisualStyleBackColor = true;
+            this.btnSelectAll.Click += new System.EventHandler(this.btnSelectAll_Click);
             // 
             // btnSelectNone
             // 
@@ -71,6 +72,7 @@ namespace WindowsFormsApp1
             this.btnSelectNone.TabIndex = 2;
             this.btnSelectNone.Text = "Select None";
             this.btnSelectNone.UseVisualStyleBackColor = true;
+            this.btnSelectNone.Click += new System.EventHandler(this.btnSelectNone_Click);
             // 
             // textBox2
             // 
@@ -363,6 +365,20 @@ namespace WindowsFormsApp1
         private void checkedListBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnSelectAll_Click(object sender, EventArgs e)
+        {
+
+            for (int i = 0; i < checkedListBox2.Items.Count; i++)
+                checkedListBox2.SetItemChecked(i,true);
+
+        }
+
+        private void btnSelectNone_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < checkedListBox2.Items.Count; i++)
+                checkedListBox2.SetItemChecked(i, false);
         }
     }
 }
