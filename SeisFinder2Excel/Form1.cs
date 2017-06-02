@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using Excel= Microsoft.Office.Interop.Excel;
-
+//using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace WindowsFormsApp1
 {
@@ -24,21 +24,11 @@ namespace WindowsFormsApp1
         {
 
         }
-
-
-
-        private void btn_select_none_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btn_convert_Click(object sender, EventArgs e)
-        {
-
-        }
+        
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnSelectAll = new System.Windows.Forms.Button();
             this.btnSelectNone = new System.Windows.Forms.Button();
@@ -62,6 +52,7 @@ namespace WindowsFormsApp1
             this.btnOpen.TabIndex = 0;
             this.btnOpen.Text = "Open";
             this.btnOpen.UseVisualStyleBackColor = true;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
             // btnSelectAll
             // 
@@ -95,6 +86,7 @@ namespace WindowsFormsApp1
             this.checkedListBox2.Name = "checkedListBox2";
             this.checkedListBox2.Size = new System.Drawing.Size(243, 259);
             this.checkedListBox2.TabIndex = 4;
+            this.checkedListBox2.SelectedIndexChanged += new System.EventHandler(this.checkedListBox2_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -174,6 +166,7 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.btnSelectNone);
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.btnOpen);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "SeisFinder2Excel";
             this.ResumeLayout(false);
@@ -191,7 +184,7 @@ namespace WindowsFormsApp1
             System.IO.StreamReader fileReader;
 
             String info1, info2;
-            int nt;
+            int nt=0;
             double dt;
             String filePathPrefix = "C:\\tmp\\AMBC\\AMBC";
             String excelExt = "xlsx";
@@ -253,7 +246,15 @@ namespace WindowsFormsApp1
                 Excel.Range cell;
                 cell = xlsWorkSheet.Cells[5, 2 + k];
                 xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray;
-                
+
+                Excel.Range chartRange;
+                Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlsWorkSheet.ChartObjects(Type.Missing);
+                Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(200, 80+300*k, 600, 250);
+                Excel.Chart chartPage = myChart.Chart;
+
+                chartRange = xlsWorkSheet.Range[cell, xlsWorkSheet.Cells[nt + 4, 2+k]];
+                chartPage.SetSourceData(chartRange, misValue);
+                chartPage.ChartType = Excel.XlChartType.xlLine;
             }
 
 
@@ -276,6 +277,92 @@ namespace WindowsFormsApp1
 
             // The user wants to exit the application. Close everything down.
             Application.Exit();
+        }
+
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                fbd.SelectedPath = this.textBox2.Text;
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    this.textBox2.Text = fbd.SelectedPath;
+                    var files = Directory.EnumerateFiles(fbd.SelectedPath);
+                    IDictionary<string, int> fileDict = new Dictionary<string, int>();
+
+                    foreach (string currentFile in files)
+                    {
+                        if (currentFile.EndsWith(".000") || currentFile.EndsWith(".090")|| currentFile.EndsWith(".ver"))
+                        {
+                            string station = Path.GetFileNameWithoutExtension(@currentFile);
+                            //string station = currentFile.Substring(0, currentFile.Length - ".000".Length);
+                            if (currentFile.EndsWith(".000"))
+                            {
+                                if (fileDict.ContainsKey(station)) fileDict[station] = fileDict[station] | 1;
+                                else
+                                    fileDict[station] = 1;
+                            }
+                            else if (currentFile.EndsWith(".090"))
+                            {
+                                if (fileDict.ContainsKey(station)) fileDict[station] = fileDict[station] | 2;
+                                else
+                                    fileDict[station] = 2;
+                            }
+                            else if (currentFile.EndsWith(".ver"))
+                            {
+                                if (fileDict.ContainsKey(station)) fileDict[station] = fileDict[station] | 4;
+                                else
+                                    fileDict[station] = 4;
+                            }
+                        }
+                        
+                    }
+                    for (int i = 0; i<fileDict.Count; i++)
+                    {
+                        var item = fileDict.ElementAt(i);
+                        var itemKey = item.Key;
+                        var itemValue = item.Value;
+                        if (itemValue == 7) //All 000, 090, ver are present
+                        {
+                            checkedListBox2.Items.Add(itemKey, CheckState.Unchecked);
+                        }
+                    }
+                }
+            }
+            //http://www.lyquidity.com/devblog/?p=136
+
+            //Stream myStream = null;
+            //OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            //openFileDialog1.InitialDirectory= System.Environment.SpecialFolder.Personal;
+            //openFileDialog1.Filter = "Acc/Vel files|*.000;*.090;*.ver";
+            //openFileDialog1.FilterIndex = 2;
+            //openFileDialog1.RestoreDirectory = true;
+
+            //if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            //{
+            //    try
+            //    {
+            //        if ((myStream = openFileDialog1.OpenFile()) != null)
+            //        {
+            //            using (myStream)
+            //            {
+            //                // Insert code to read the stream here.
+            //            }
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+            //    }
+            //}
+        }
+
+        private void checkedListBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
