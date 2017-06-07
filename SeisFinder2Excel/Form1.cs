@@ -130,9 +130,9 @@ namespace WindowsFormsApp1
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(12, 355);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 13);
+            this.label3.Size = new System.Drawing.Size(77, 13);
             this.label3.TabIndex = 9;
-            this.label3.Text = "Save As :";
+            this.label3.Text = "Output Folder :";
             // 
             // btnBrowse
             // 
@@ -178,97 +178,148 @@ namespace WindowsFormsApp1
 
         private void btnConvert_Click(object sender, EventArgs e)
         {
+            string inputPath = this.textBox2.Text;
+            string outputPath = this.textBox3.Text;
             Object misValue = System.Reflection.Missing.Value;
             Excel.Application xls = new Excel.Application();
-            Excel.Workbook xlsWorkBook = xls.Workbooks.Add(misValue);
-            Excel.Worksheet xlsWorkSheet = (Excel.Worksheet)xlsWorkBook.Sheets[1];
-            
-            System.IO.StreamReader fileReader;
-
-            String info1, info2;
-            int nt=0;
-            double dt;
-            String filePathPrefix = "C:\\tmp\\AMBC\\AMBC";
             String excelExt = "xlsx";
 
-            xlsWorkSheet.Cells[1, 1] = "Component";
-            xlsWorkSheet.Cells[2, 1] = "No. of timesteps";
-            xlsWorkSheet.Cells[3, 1] = "Size of timesteps";
-            xlsWorkSheet.Cells[4, 1] = "Acceleration";
+            Directory.CreateDirectory(outputPath);
 
-            String[] componentsCode = { "000", "090", "ver" };
-            String[] componentsStr = { "X-axis (000)", "Y-axis (090)", "Z-axis (ver)" };
-
-            for (int k=0;k<3;k++)
+            foreach (string stationCode in checkedListBox2.CheckedItems)
             {
-                String ext = componentsCode[k];
-                fileReader = new StreamReader(new FileStream(filePathPrefix + "." + ext, FileMode.Open));
-                info1 = fileReader.ReadLine();
-                info2 = fileReader.ReadLine();
+                Excel.Workbook xlsWorkBook = xls.Workbooks.Add(misValue);
+                Excel.Worksheet xlsWorkSheet = (Excel.Worksheet)xlsWorkBook.Sheets[1];
 
-                int LastNonEmpty = -1;
-                String[] info2Array = info2.Split();
-                for (int i = 0; i < info2Array.Length; i++)
+                System.IO.StreamReader fileReader;
+
+                String info1, info2;
+                int nt = 0;
+                double dt;
+                String filePathPrefix = inputPath+"\\"+ stationCode;
+                String outputFile = outputPath + "\\" + stationCode + "." + excelExt;
+
+
+
+                xlsWorkSheet.Cells[1, 1] = "Component";
+                xlsWorkSheet.Cells[2, 1] = "No. of timesteps";
+                xlsWorkSheet.Cells[3, 1] = "Size of timesteps";
+                xlsWorkSheet.Cells[4, 1] = "Acceleration";
+
+                String[] componentsCode = { "000", "090", "ver" };
+                String[] componentsStr = { "X-axis (000)", "Y-axis (090)", "Z-axis (ver)" };
+
+                for (int k = 0; k < 3; k++)
                 {
-                    if (info2Array[i] != "") {
-                        LastNonEmpty += 1;
-                        info2Array[LastNonEmpty] = info2Array[i];
-                    }
-                }
+                    String ext = componentsCode[k];
+                    fileReader = new StreamReader(new FileStream(filePathPrefix + "." + ext, FileMode.Open));
+                    info1 = fileReader.ReadLine();
+                    info2 = fileReader.ReadLine();
 
-                nt = Convert.ToInt32(info2Array[0]);
-                dt = Convert.ToDouble(info2Array[1]);
-
-                int [,] intRange = new int[nt,1];
-                xlsWorkSheet.Cells[1, 2 + k] = componentsStr[k];
-                xlsWorkSheet.Cells[2, 2 + k] = nt;
-                xlsWorkSheet.Cells[3, 2 + k] = dt;
-
-                LastNonEmpty = -1;
-
-                String lines = fileReader.ReadToEnd();
-                String[] strArray = lines.Split();
-                Double[,] dblArray = new Double[nt,1]; //needs to be 2-d to be able to bulk write
-
-                for (int i=0;i< strArray.Length;i++)
-                {
-                    if (strArray[i]!="")
+                    int LastNonEmpty = -1;
+                    String[] info2Array = info2.Split();
+                    for (int i = 0; i < info2Array.Length; i++)
                     {
-                        LastNonEmpty += 1;
-                        intRange[LastNonEmpty,0] = LastNonEmpty + 1;
-                        dblArray[LastNonEmpty,0] = Convert.ToDouble(strArray[i].Replace("\n", ""));
-
+                        if (info2Array[i] != "")
+                        {
+                            LastNonEmpty += 1;
+                            info2Array[LastNonEmpty] = info2Array[i];
+                        }
                     }
-                }
-                int nt2 = LastNonEmpty + 1;
-                if (k==0)
-                {
-                    xlsWorkSheet.Range["A5"].Resize[nt2, 1].Value = intRange;
-                }
-                Excel.Range cell;
-                cell = xlsWorkSheet.Cells[5, 2 + k];
-                xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray;
 
-                Excel.Range chartRange;
-                Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlsWorkSheet.ChartObjects(Type.Missing);
-                Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(200, 80+300*k, 600, 250);
-                Excel.Chart chartPage = myChart.Chart;
+                    nt = Convert.ToInt32(info2Array[0]);
+                    dt = Convert.ToDouble(info2Array[1]);
 
-                chartRange = xlsWorkSheet.Range[cell, xlsWorkSheet.Cells[nt + 4, 2+k]];
-                chartPage.SetSourceData(chartRange, misValue);
-                chartPage.ChartType = Excel.XlChartType.xlLine;
+                    //int[,] intRange = new int[nt, 1];
+                    Double[,] timeRange = new double[nt, 1];
+                    xlsWorkSheet.Cells[1, 2 + k] = componentsStr[k];
+                    xlsWorkSheet.Cells[2, 2 + k] = nt;
+                    xlsWorkSheet.Cells[3, 2 + k] = dt;
+
+                    LastNonEmpty = -1;
+
+                    String lines = fileReader.ReadToEnd();
+                    String[] strArray = lines.Split();
+                    Double[,] dblArray = new Double[nt, 1]; //needs to be 2-d to be able to bulk write
+
+                    for (int i = 0; i < strArray.Length; i++)
+                    {
+                        if (strArray[i] != "")
+                        {
+                            LastNonEmpty += 1;
+                            //intRange[LastNonEmpty, 0] = LastNonEmpty + 1;
+                            timeRange[LastNonEmpty, 0] = LastNonEmpty * dt;
+                            dblArray[LastNonEmpty, 0] = Convert.ToDouble(strArray[i].Replace("\n", ""));
+
+                        }
+                    }
+                    int nt2 = LastNonEmpty + 1;
+                    if (k == 0)
+                    {
+                        xlsWorkSheet.Range["A5"].Resize[nt2, 1].Value = timeRange; // intRange; //index in column "A"
+                    }
+                    Excel.Range cell;
+                    cell = xlsWorkSheet.Cells[5, 2 + k];
+                    xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray; //bulk write column "B"
+
+                    Excel.Range chartRange;
+                    Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlsWorkSheet.ChartObjects(Type.Missing);
+                    Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(200, 80 + 300 * k, 600, 250);
+                    Excel.Chart chartPage = myChart.Chart;
+
+                    chartRange = xlsWorkSheet.Range[cell, xlsWorkSheet.Cells[nt + 4, 2 + k]];
+                    
+                    chartPage.SetSourceData(chartRange, misValue);
+                    chartPage.ChartType = Excel.XlChartType.xlLine;
+                    chartPage.HasTitle = true;
+                    
+                    Excel.Series series = (Excel.Series) chartPage.SeriesCollection(1);
+
+                    Microsoft.Office.Interop.Excel.Axis xAxis = (Microsoft.Office.Interop.Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlCategory, Excel.XlAxisGroup.xlPrimary);
+                    Microsoft.Office.Interop.Excel.Axis yAxis = (Microsoft.Office.Interop.Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlValue, Excel.XlAxisGroup.xlPrimary);
+                    xAxis.HasTitle = true;
+                    xAxis.AxisTitle.Text = "Time (sec)";
+                    xAxis.CategoryNames = (Excel.Range)xlsWorkSheet.Range["A5"].Resize[nt2, 1];
+                    xAxis.TickLabelPosition = Excel.XlTickLabelPosition.xlTickLabelPositionLow;
+                    yAxis.HasTitle = true;
+                    yAxis.AxisTitle.Text = "Acceleration (cm/s^2)";
+                    series.Name = ext;
+
+                    switch (k)
+                    {
+                        case 0:
+                            chartPage.ChartTitle.Text = "["+ stationCode+"]: "+"Acceleration along X-axis (" +ext+")";
+                            series.Border.Color = (int)Excel.XlRgbColor.rgbRed;
+                            
+                            break;
+                        case 1:
+                            chartPage.ChartTitle.Text = "["+ stationCode+"]: "+"Acceleration along Y-axis (" + ext + ")";
+                            series.Border.Color = (int)Excel.XlRgbColor.rgbBlue;
+                            break;
+                        case 2:
+                            chartPage.ChartTitle.Text = "[" + stationCode + "]: " + "Acceleration along Z-axis (" + ext + ")";
+                            series.Border.Color = (int)Excel.XlRgbColor.rgbGreen;
+                            break;
+                    }
+                        
+
+                    
+
+                }
+
+
+
+                xlsWorkBook.SaveAs(outputFile, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, misValue, misValue,
+            false, false, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange,
+            misValue, misValue, misValue, misValue, misValue);
+
+                xlsWorkBook.Close();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(xlsWorkSheet);
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(xlsWorkBook);
             }
-
-
-
-            xlsWorkBook.SaveAs(filePathPrefix+"."+excelExt, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, misValue, misValue,
-        false, false, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange,
-        misValue, misValue, misValue, misValue, misValue);
-
-            xlsWorkBook.Close();
+            
             xls.Quit();
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlsWorkSheet);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlsWorkBook);
+
             System.Runtime.InteropServices.Marshal.ReleaseComObject(xls);
             MessageBox.Show("Done!");
 
@@ -287,6 +338,8 @@ namespace WindowsFormsApp1
             {
                 fbd.SelectedPath = this.textBox2.Text;
                 DialogResult result = fbd.ShowDialog();
+
+                this.textBox3.Text = fbd.SelectedPath + "\\Output";
 
                 if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
