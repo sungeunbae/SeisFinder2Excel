@@ -41,6 +41,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.Label label4;
     }
 }
 

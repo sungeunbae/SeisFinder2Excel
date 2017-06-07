@@ -42,21 +42,23 @@ namespace WindowsFormsApp1
             this.label3 = new System.Windows.Forms.Label();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
+            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(262, 26);
+            this.btnOpen.Location = new System.Drawing.Point(504, 27);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(75, 23);
             this.btnOpen.TabIndex = 0;
-            this.btnOpen.Text = "Open";
+            this.btnOpen.Text = "Browse";
             this.btnOpen.UseVisualStyleBackColor = true;
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(262, 83);
+            this.btnSelectAll.Location = new System.Drawing.Point(12, 397);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
             this.btnSelectAll.TabIndex = 1;
@@ -66,7 +68,7 @@ namespace WindowsFormsApp1
             // 
             // btnSelectNone
             // 
-            this.btnSelectNone.Location = new System.Drawing.Point(262, 117);
+            this.btnSelectNone.Location = new System.Drawing.Point(93, 397);
             this.btnSelectNone.Name = "btnSelectNone";
             this.btnSelectNone.Size = new System.Drawing.Size(75, 23);
             this.btnSelectNone.TabIndex = 2;
@@ -78,22 +80,22 @@ namespace WindowsFormsApp1
             // 
             this.textBox2.Location = new System.Drawing.Point(13, 29);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(243, 20);
+            this.textBox2.Size = new System.Drawing.Size(468, 20);
             this.textBox2.TabIndex = 3;
             // 
             // checkedListBox2
             // 
             this.checkedListBox2.FormattingEnabled = true;
-            this.checkedListBox2.Location = new System.Drawing.Point(13, 83);
+            this.checkedListBox2.Location = new System.Drawing.Point(12, 123);
             this.checkedListBox2.Name = "checkedListBox2";
-            this.checkedListBox2.Size = new System.Drawing.Size(243, 259);
+            this.checkedListBox2.Size = new System.Drawing.Size(180, 259);
             this.checkedListBox2.TabIndex = 4;
             this.checkedListBox2.SelectedIndexChanged += new System.EventHandler(this.checkedListBox2_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 67);
+            this.label1.Location = new System.Drawing.Point(10, 104);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(94, 13);
             this.label1.TabIndex = 5;
@@ -110,7 +112,7 @@ namespace WindowsFormsApp1
             // 
             // btnConvert
             // 
-            this.btnConvert.Location = new System.Drawing.Point(94, 400);
+            this.btnConvert.Location = new System.Drawing.Point(352, 397);
             this.btnConvert.Name = "btnConvert";
             this.btnConvert.Size = new System.Drawing.Size(75, 23);
             this.btnConvert.TabIndex = 7;
@@ -120,15 +122,15 @@ namespace WindowsFormsApp1
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(13, 371);
+            this.textBox3.Location = new System.Drawing.Point(12, 70);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(243, 20);
+            this.textBox3.Size = new System.Drawing.Size(469, 20);
             this.textBox3.TabIndex = 8;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 355);
+            this.label3.Location = new System.Drawing.Point(12, 54);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 13);
             this.label3.TabIndex = 9;
@@ -136,7 +138,7 @@ namespace WindowsFormsApp1
             // 
             // btnBrowse
             // 
-            this.btnBrowse.Location = new System.Drawing.Point(13, 400);
+            this.btnBrowse.Location = new System.Drawing.Point(504, 67);
             this.btnBrowse.Name = "btnBrowse";
             this.btnBrowse.Size = new System.Drawing.Size(75, 23);
             this.btnBrowse.TabIndex = 10;
@@ -145,7 +147,7 @@ namespace WindowsFormsApp1
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(262, 400);
+            this.btnExit.Location = new System.Drawing.Point(504, 397);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(75, 23);
             this.btnExit.TabIndex = 11;
@@ -153,9 +155,29 @@ namespace WindowsFormsApp1
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(211, 123);
+            this.textBox4.Multiline = true;
+            this.textBox4.Name = "textBox4";
+            this.textBox4.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox4.Size = new System.Drawing.Size(368, 259);
+            this.textBox4.TabIndex = 12;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(211, 104);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(54, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Progress :";
+            // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(349, 429);
+            this.ClientSize = new System.Drawing.Size(591, 432);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.textBox4);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnBrowse);
             this.Controls.Add(this.label3);
@@ -183,11 +205,16 @@ namespace WindowsFormsApp1
             Object misValue = System.Reflection.Missing.Value;
             Excel.Application xls = new Excel.Application();
             String excelExt = "xlsx";
-
             Directory.CreateDirectory(outputPath);
 
+            this.textBox4.Text ="";
+
+            int numCheckedStations = checkedListBox2.CheckedItems.Count ;
+            int numStationsProcessed=0;
             foreach (string stationCode in checkedListBox2.CheckedItems)
             {
+                numStationsProcessed++;
+
                 Excel.Workbook xlsWorkBook = xls.Workbooks.Add(misValue);
                 Excel.Worksheet xlsWorkSheet = (Excel.Worksheet)xlsWorkBook.Sheets[1];
 
@@ -199,7 +226,7 @@ namespace WindowsFormsApp1
                 String filePathPrefix = inputPath+"\\"+ stationCode;
                 String outputFile = outputPath + "\\" + stationCode + "." + excelExt;
 
-
+                this.textBox4.Text +="Processing "+stationCode + "("+numStationsProcessed+"/"+numCheckedStations+")  ";
 
                 xlsWorkSheet.Cells[1, 1] = "Component";
                 xlsWorkSheet.Cells[2, 1] = "No. of timesteps";
@@ -211,6 +238,10 @@ namespace WindowsFormsApp1
 
                 for (int k = 0; k < 3; k++)
                 {
+                 
+                    this.textBox4.Text += (k+1);
+                    this.textBox4.Text += "...";   
+
                     String ext = componentsCode[k];
                     fileReader = new StreamReader(new FileStream(filePathPrefix + "." + ext, FileMode.Open));
                     info1 = fileReader.ReadLine();
@@ -262,6 +293,8 @@ namespace WindowsFormsApp1
                     cell = xlsWorkSheet.Cells[5, 2 + k];
                     xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray; //bulk write column "B"
 
+
+                    
                     Excel.Range chartRange;
                     Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlsWorkSheet.ChartObjects(Type.Missing);
                     Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(200, 80 + 300 * k, 600, 250);
@@ -285,6 +318,7 @@ namespace WindowsFormsApp1
                     yAxis.AxisTitle.Text = "Acceleration (cm/s^2)";
                     series.Name = ext;
 
+                    
                     switch (k)
                     {
                         case 0:
@@ -301,13 +335,11 @@ namespace WindowsFormsApp1
                             series.Border.Color = (int)Excel.XlRgbColor.rgbGreen;
                             break;
                     }
-                        
-
                     
 
                 }
 
-
+                this.textBox4.Text += "Done..!"+Environment.NewLine;
 
                 xlsWorkBook.SaveAs(outputFile, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, misValue, misValue,
             false, false, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange,
@@ -321,7 +353,8 @@ namespace WindowsFormsApp1
             xls.Quit();
 
             System.Runtime.InteropServices.Marshal.ReleaseComObject(xls);
-            MessageBox.Show("Done!");
+            //MessageBox.Show("Done!");
+            this.textBox4.Text += "Finished!!"+ Environment.NewLine;
 
         }
 
@@ -432,6 +465,13 @@ namespace WindowsFormsApp1
         {
             for (int i = 0; i < checkedListBox2.Items.Count; i++)
                 checkedListBox2.SetItemChecked(i, false);
+        }
+
+
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
