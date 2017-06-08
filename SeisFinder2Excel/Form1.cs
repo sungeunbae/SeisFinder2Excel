@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using Excel= Microsoft.Office.Interop.Excel;
+using System.Reflection;
 //using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace WindowsFormsApp1
@@ -192,7 +193,8 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.btnOpen);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "SeisFinder2Excel";
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.Text = String.Format("SeisFinder2Excel  QuakeCoRE Soft - version {0}", version);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -230,17 +232,18 @@ namespace WindowsFormsApp1
 
                 xlsWorkSheet.Cells[1, 1] = "Component";
                 xlsWorkSheet.Cells[2, 1] = "No. of timesteps";
-                xlsWorkSheet.Cells[3, 1] = "Size of timesteps";
-                xlsWorkSheet.Cells[4, 1] = "Acceleration";
+                xlsWorkSheet.Cells[3, 1] = "Size of timesteps (seconds)";
+                xlsWorkSheet.Cells[4, 1] = "Time (seconds)";
+                xlsWorkSheet.Cells[5, 1] = "Acceleration";
 
                 String[] componentsCode = { "000", "090", "ver" };
                 String[] componentsStr = { "X-axis (000)", "Y-axis (090)", "Z-axis (ver)" };
 
-                for (int k = 0; k < 3; k++)
+                for (int k = 0; k < 3; k++) //Iterates each component file
                 {
-                 
-                    this.textBox4.Text += (k+1);
-                    this.textBox4.Text += "...";   
+
+                    this.textBox4.Text += (k + 1);
+                    this.textBox4.Text += "...";
 
                     String ext = componentsCode[k];
                     fileReader = new StreamReader(new FileStream(filePathPrefix + "." + ext, FileMode.Open));
@@ -258,10 +261,9 @@ namespace WindowsFormsApp1
                         }
                     }
 
-                    nt = Convert.ToInt32(info2Array[0]);
-                    dt = Convert.ToDouble(info2Array[1]);
+                    nt = Convert.ToInt32(info2Array[0]); //number of time steps
+                    dt = Convert.ToDouble(info2Array[1]); //time step size
 
-                    //int[,] intRange = new int[nt, 1];
                     Double[,] timeRange = new double[nt, 1];
                     xlsWorkSheet.Cells[1, 2 + k] = componentsStr[k];
                     xlsWorkSheet.Cells[2, 2 + k] = nt;
@@ -278,7 +280,6 @@ namespace WindowsFormsApp1
                         if (strArray[i] != "")
                         {
                             LastNonEmpty += 1;
-                            //intRange[LastNonEmpty, 0] = LastNonEmpty + 1;
                             timeRange[LastNonEmpty, 0] = LastNonEmpty * dt;
                             dblArray[LastNonEmpty, 0] = Convert.ToDouble(strArray[i].Replace("\n", ""));
 
@@ -287,20 +288,29 @@ namespace WindowsFormsApp1
                     int nt2 = LastNonEmpty + 1;
                     if (k == 0)
                     {
-                        xlsWorkSheet.Range["A5"].Resize[nt2, 1].Value = timeRange; // intRange; //index in column "A"
+                        xlsWorkSheet.Range["A5"].Resize[nt2, 1].Value = timeRange; // first column filled with time steps
                     }
                     Excel.Range cell;
                     cell = xlsWorkSheet.Cells[5, 2 + k];
-                    xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray; //bulk write column "B"
+                    xlsWorkSheet.Range[cell, cell].Resize[nt2, 1].Value = dblArray; //bulk write at column "B, C, D"
 
 
-                    
+                }
+                Excel.WorksheetFunction wsf = xls.WorksheetFunction;
+                Double maxAcc = wsf.Max(xlsWorkSheet.Range[xlsWorkSheet.Cells[5, 4], xlsWorkSheet.Cells[nt + 4, 4]]); //find the maximum and minimum
+                Double minAcc = wsf.Min(xlsWorkSheet.Range[xlsWorkSheet.Cells[5, 4], xlsWorkSheet.Cells[nt + 4, 4]]);
+                Double maxAmpAcc = Math.Max(maxAcc, -1.0*minAcc); //Select the max of absolute value of two
+
+                for (int k = 0; k < 3; k++) // Plotting
+                {
+                    String ext = componentsCode[k];
+
                     Excel.Range chartRange;
                     Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlsWorkSheet.ChartObjects(Type.Missing);
                     Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(200, 80 + 300 * k, 600, 250);
                     Excel.Chart chartPage = myChart.Chart;
 
-                    chartRange = xlsWorkSheet.Range[cell, xlsWorkSheet.Cells[nt + 4, 2 + k]];
+                    chartRange = xlsWorkSheet.Range[xlsWorkSheet.Cells[5, 2 + k], xlsWorkSheet.Cells[nt + 4, 2 + k]];
                     
                     chartPage.SetSourceData(chartRange, misValue);
                     chartPage.ChartType = Excel.XlChartType.xlLine;
@@ -312,10 +322,13 @@ namespace WindowsFormsApp1
                     Microsoft.Office.Interop.Excel.Axis yAxis = (Microsoft.Office.Interop.Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlValue, Excel.XlAxisGroup.xlPrimary);
                     xAxis.HasTitle = true;
                     xAxis.AxisTitle.Text = "Time (sec)";
-                    xAxis.CategoryNames = (Excel.Range)xlsWorkSheet.Range["A5"].Resize[nt2, 1];
+                    xAxis.CategoryNames = (Excel.Range)xlsWorkSheet.Range["A5"].Resize[nt, 1];
                     xAxis.TickLabelPosition = Excel.XlTickLabelPosition.xlTickLabelPositionLow;
                     yAxis.HasTitle = true;
                     yAxis.AxisTitle.Text = "Acceleration (cm/s^2)";
+                    yAxis.MinimumScale = (-1* maxAmpAcc * 3.0);
+                    yAxis.MaximumScale = (maxAmpAcc * 3.0);
+
                     series.Name = ext;
 
                     
@@ -338,6 +351,8 @@ namespace WindowsFormsApp1
                     
 
                 }
+
+
 
                 this.textBox4.Text += "Done..!"+Environment.NewLine;
 
