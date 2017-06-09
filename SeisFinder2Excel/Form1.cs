@@ -209,7 +209,7 @@ namespace WindowsFormsApp1
             String excelExt = "xlsx";
             Directory.CreateDirectory(outputPath);
 
-            this.textBox4.Text ="";
+            this.textBox4.Clear();
 
             int numCheckedStations = checkedListBox2.CheckedItems.Count ;
             int numStationsProcessed=0;
@@ -228,7 +228,8 @@ namespace WindowsFormsApp1
                 String filePathPrefix = inputPath+"\\"+ stationCode;
                 String outputFile = outputPath + "\\" + stationCode + "." + excelExt;
 
-                this.textBox4.Text +="Processing "+stationCode + "("+numStationsProcessed+"/"+numCheckedStations+")  ";
+                //this.textBox4.Text +="Processing "+stationCode + "("+numStationsProcessed+"/"+numCheckedStations+")  ";
+                this.textBox4.AppendText("Processing " + stationCode + "(" + numStationsProcessed + "/" + numCheckedStations + ")  ");
 
                 xlsWorkSheet.Cells[1, 1] = "Component";
                 xlsWorkSheet.Cells[2, 1] = "No. of timesteps";
@@ -242,8 +243,7 @@ namespace WindowsFormsApp1
                 for (int k = 0; k < 3; k++) //Iterates each component file
                 {
 
-                    this.textBox4.Text += (k + 1);
-                    this.textBox4.Text += "...";
+                    this.textBox4.AppendText(Convert.ToString(k + 1)+"...");
 
                     String ext = componentsCode[k];
                     fileReader = new StreamReader(new FileStream(filePathPrefix + "." + ext, FileMode.Open));
@@ -354,7 +354,12 @@ namespace WindowsFormsApp1
 
 
 
-                this.textBox4.Text += "Done..!"+Environment.NewLine;
+                this.textBox4.AppendText("Done..!" +Environment.NewLine);
+
+                if (File.Exists(outputFile)) // delete file if it already exists
+                {
+                    File.Delete(outputFile);
+                }
 
                 xlsWorkBook.SaveAs(outputFile, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, misValue, misValue,
             false, false, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange,
@@ -369,7 +374,7 @@ namespace WindowsFormsApp1
 
             System.Runtime.InteropServices.Marshal.ReleaseComObject(xls);
             //MessageBox.Show("Done!");
-            this.textBox4.Text += "Finished!!"+ Environment.NewLine;
+            this.textBox4.AppendText("Finished!!" + Environment.NewLine);
 
         }
 
@@ -393,6 +398,9 @@ namespace WindowsFormsApp1
                 {
                     this.textBox2.Text = fbd.SelectedPath;
                     var files = Directory.EnumerateFiles(fbd.SelectedPath);
+
+                    checkedListBox2.Items.Clear();
+
                     IDictionary<string, int> fileDict = new Dictionary<string, int>();
 
                     foreach (string currentFile in files)
